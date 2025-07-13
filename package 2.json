@@ -1,0 +1,29 @@
+{
+  "name": "airplay-web-player",
+  "version": "1.0.0",
+  "description": "Advanced web video player with full metadata support",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "build": "cd client && npm run build",
+    "install-client": "cd client && npm install",
+    "install-server": "npm install",
+    "install-all": "npm run install-server && npm run install-client"
+  },
+  "keywords": ["video", "player", "airplay", "web", "ffmpeg"],
+  "author": "bozhenkas",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "fluent-ffmpeg": "^2.1.2",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
+    "fs-extra": "^11.1.1",
+    "mime-types": "^2.1.35"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+} 
