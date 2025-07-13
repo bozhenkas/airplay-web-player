@@ -128,11 +128,33 @@ app.get('/api/stream', (req, res) => {
   }
 });
 
+// Получение субтитров в формате WebVTT по индексу
+app.get('/api/subtitle', (req, res) => {
+  const filePath = req.query.path;
+  const index = parseInt(req.query.index, 10);
+  if (!filePath || !fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Файл не найден' });
+  }
+  if (isNaN(index)) {
+    return res.status(400).json({ error: 'Некорректный индекс субтитров' });
+  }
+  res.setHeader('Content-Type', 'text/vtt');
+  ffmpeg(filePath)
+    .outputOptions([`-map 0:s:${index}`, '-f webvtt'])
+    .on('error', err => {
+      console.error('Ошибка извлечения субтитров:', err.message);
+      if (!res.headersSent) {
+        res.status(500).end();
+      }
+    })
+    .pipe(res, { end: true });
+});
+
 // Фронтенд
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "../client/build/index.html"));
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
-}); 
+});

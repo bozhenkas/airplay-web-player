@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Play, Pause, Volume2, VolumeX, Maximize, FileVideo } from 'lucide-react';
 import axios from 'axios';
 import './App.css';
@@ -38,6 +38,8 @@ function App() {
   const [showControls, setShowControls] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [subtitleSrc, setSubtitleSrc] = useState('');
 
   const videoRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -186,6 +188,27 @@ function App() {
     }, 3000);
   };
 
+  // Переключение аудио- и субтитровых дорожек
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.audioTracks && video.audioTracks.length) {
+      for (let i = 0; i < video.audioTracks.length; i++) {
+        video.audioTracks[i].enabled = i === selectedAudioTrack;
+      }
+    }
+    if (selectedSubtitleTrack >= 0) {
+      setSubtitleSrc(`/api/subtitle?path=${encodeURIComponent(filePath)}&index=${selectedSubtitleTrack}`);
+    } else {
+      setSubtitleSrc('');
+      if (video.textTracks) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          video.textTracks[i].mode = 'disabled';
+        }
+      }
+    }
+  }, [selectedAudioTrack, selectedSubtitleTrack, filePath]);
+
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -259,7 +282,11 @@ function App() {
                 onDoubleClick={handleFullscreen}
                 controls
                 crossOrigin="anonymous"
-              />
+              >
+                {subtitleSrc && (
+                  <track kind="subtitles" src={subtitleSrc} default />
+                )}
+              </video>
               {showControls && (
                 <div className="video-controls">
                   <div className="progress-bar" onClick={handleSeek}>

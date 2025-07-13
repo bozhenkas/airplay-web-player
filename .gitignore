@@ -108,3 +108,5 @@ Thumbs.db
 # FFmpeg temporary files
 *.tmp
 *.temp 
+!client/public/index.html
+!client/public
